@@ -1,0 +1,1 @@
+Este repositório traz a trajetória de um CRUD em PHP do procedural ao Orientado à Objetos.
