@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listar</title>
+    <link rel="stylesheet" href="./css/list.css" />
+  </head>
+  <body>
+    <table border="1">
+      <thead>
+        <tr>
+          <td></td>
+          <td></td>
+          <td>Id</td>
+          <td>Nome</td>
+          <td>Endereço</td>
+          <td>Bairro</td>
+          <td>Telefone</td>
+        </tr>
+      </thead>
+      <tbody>
+        {items}
+      </tbody>
+    </table>
+    <button onclick="window.location='pessoa_form.php'">
+      <img src="./images/add.png" style="width: 17px" /> Inserir
+    </button>
+  </body>
+</html>
