@@ -1,0 +1,20 @@
+<bases>
+    <base id="1">
+        <name> teste </name>
+        <host> 192.168.0.1 </host>
+        <type> mysql </type>
+        <user> mary </user>
+    </base>
+    <base id="2">
+        <name> teste </name>
+        <host> 192.168.0.2 </host>
+        <type> pgsql </type>
+        <user> admin </user>
+    </base>
+    <base id="3">
+        <name> teste </name>
+        <host> 192.168.0.2 </host>
+        <type> pgsql </type>
+        <user> admin </user>
+    </base>
+</bases>
