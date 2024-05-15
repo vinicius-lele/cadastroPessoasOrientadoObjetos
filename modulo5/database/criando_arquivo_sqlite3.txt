@@ -1,0 +1,6 @@
+sqlite3 estoque.db
+
+CREATE TABLE produto (id INT(4) NOT NULL PRIMARY KEY, descricao TEXT, estoque FLOAT, preco_custo FLOAT, preco_venda FLOAT, codigo_barras TEXT, data_cadastro DATE, origem CHAR(1));
+
+.q
+

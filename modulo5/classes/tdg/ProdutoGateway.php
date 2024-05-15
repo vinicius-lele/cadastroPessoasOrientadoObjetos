@@ -15,9 +15,9 @@ class ProdutoGateway
         return $result->fetchObject($class);
     }
 
-    public function all($filter, $class = 'stdClass')
+    public function all($filter='', $class = 'stdClass')
     {
-        $sql = "SELECT * FROM produto";
+        $sql = "SELECT * FROM produto ";
         if($filter)
         {
             $sql .= "WHERE $filter";
@@ -41,7 +41,7 @@ class ProdutoGateway
             $sql = "INSERT INTO produto (id, descricao, estoque, preco_custo, preco_venda, codigo_barras, data_cadastro, origem) VALUES ('{$id}','{$data->descricao}','{$data->estoque}','{$data->preco_custo}','{$data->preco_venda}','{$data->codigo_barras}','{$data->data_cadastro}','{$data->origem}')";
         }
         else{
-            $sql = "UPDATE produto SET descricao = '{$data->descricao}',estoque='{$data->estoque}',preco_custo='{$data->preco_custo}',preco_venda='{$data->preco_vendas}',codigo_barras='{$data->codigo_barras}',data_cadastro='{$data->data_cadastro}',origem='{$data->origem}' WHERE id = '{$data->id}'";
+            $sql = "UPDATE produto SET descricao = '{$data->descricao}',estoque='{$data->estoque}',preco_custo='{$data->preco_custo}',preco_venda='{$data->preco_venda}',codigo_barras='{$data->codigo_barras}',data_cadastro='{$data->data_cadastro}',origem='{$data->origem}' WHERE id = '{$data->id}'";
         }
 
         print "$sql <hr />";
