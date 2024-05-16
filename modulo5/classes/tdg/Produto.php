@@ -12,7 +12,7 @@ class Produto
     {
         return $this->data[$prop];
     }
-    public function set($prop, $value)
+    public function __set($prop, $value)
     {
         $this->data[$prop] = $value;
     }

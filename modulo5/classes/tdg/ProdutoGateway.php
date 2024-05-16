@@ -10,7 +10,6 @@ class ProdutoGateway
     public function find($id, $class = 'stdClass')
     {
         $sql = "SELECT * FROM produto WHERE id ='$id'";
-        print "$sql <hr/>";
         $result = self::$conn->query($sql);
         return $result->fetchObject($class);
     }
@@ -22,7 +21,6 @@ class ProdutoGateway
         {
             $sql .= "WHERE $filter";
         }
-        print "$sql <hr/>";
         $result = self::$conn->query($sql);
         return $result->fetchAll(PDO::FETCH_CLASS, $class);
     }
@@ -30,7 +28,6 @@ class ProdutoGateway
     public function delete($id)
     {
         $sql = "DELETE FROM produto WHERE id ='$id'";
-        print "$sql <hr/>";
         return self::$conn->query($sql);
     }
 
@@ -44,14 +41,12 @@ class ProdutoGateway
             $sql = "UPDATE produto SET descricao = '{$data->descricao}',estoque='{$data->estoque}',preco_custo='{$data->preco_custo}',preco_venda='{$data->preco_venda}',codigo_barras='{$data->codigo_barras}',data_cadastro='{$data->data_cadastro}',origem='{$data->origem}' WHERE id = '{$data->id}'";
         }
 
-        print "$sql <hr />";
         return self::$conn->exec($sql);
     }
 
     public function getLastId()
     {
         $sql = "SELECT max(id) as max FROM produto";
-        print "$sql <hr/>";
         $result = self::$conn->query($sql);
 
         $data = $result->fetchObject();

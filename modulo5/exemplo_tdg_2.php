@@ -14,11 +14,11 @@ try{
 
     foreach($produtos as $produto)
     {
-        $produto->delete();
+        print $produto->descricao.'<hr/>';
     }
 
-    $produto = new Produto;
-    $produto->descricao = 'Vinho';
+    /*$produto = new Produto;
+    $produto->descricao = 'Paçoca';
     $produto->estoque = 8;
     $produto->preco_custo = 12;
     $produto->preco_venda = 18;
@@ -26,10 +26,11 @@ try{
     $produto->data_cadastro = date('Y-m-d');
     $produto->origem = 'N';
     $produto->save();
+    */
 
-    $outro = Produto::find(1);
+    $outro = Produto::find(27);
     $outro->registraCompra(14,5);
-    $outro->save;
+    $outro->save();
 }
 catch (Exception $e)
 {
