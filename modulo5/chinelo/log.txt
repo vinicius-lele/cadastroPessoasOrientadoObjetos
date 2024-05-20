@@ -1,0 +1,1 @@
+2024-05-20 19:01:57 : SELECT max(id) FROM produto2024-05-20 19:01:57 : INSERT INTO produto(id) values (58)
