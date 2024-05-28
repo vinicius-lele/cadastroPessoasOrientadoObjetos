@@ -9,7 +9,7 @@ class Connection
     private function __construct(){}
     public static function open($name)
     {
-        file_exists("config/{$name}.ini")?$db = parse_ini_file("config/{$name}.ini"):throw new Exception("Arquivo {$name} não encontrado");
+        file_exists("Config/{$name}.ini")?$db = parse_ini_file("Config/{$name}.ini"):throw new Exception("Arquivo {$name} não encontrado");
 
         $user = isset($db['user']) ? $db['user'] : null;
         $pass = isset($db['pass']) ? $db['pass'] : null;
