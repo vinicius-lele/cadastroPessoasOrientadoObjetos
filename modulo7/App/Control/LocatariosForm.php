@@ -1,0 +1,95 @@
+<?php
+use Livro\Control\Page;
+use Livro\Widgets\Form\Form;
+use Livro\Widgets\Form\Entry;
+use Livro\Widgets\Form\Combo;
+use Livro\Widgets\Wrapper\FormWrapper;
+
+use Livro\Database\Transaction;
+use Livro\Control\Action;
+use Livro\Widgets\Dialog\Message;
+
+class LocatariosForm extends Page
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->form = new FormWrapper(new Form('form_pessoas'));
+        $this->form->setTitle('Locatário');
+
+        $codigo             = new Entry('id');
+        $nome               = new Entry('nome_locatario');
+        $documento          = new Entry('documento');
+        $responsavel        = new Entry('responsavel_locatario');
+        $telefone           = new Entry('telefone');
+        $tipo_locatario     = new Combo('tipo_locatario');
+        $data_cadastro      = new Entry('data_cadastro');
+        
+        Transaction::open('livro');
+        $tipos_locatarios = TipoLocatario::all();
+        $items = [];
+        foreach($tipos_locatarios as $tipo_locatarios)
+        {
+            $items[$tipo_locatarios->id] = $tipo_locatarios->nome_tipo_locatario;
+        }
+        $tipo_locatario->addItems($items);
+        Transaction::close();
+
+        $this->form->addField('Código', $codigo, '5%');
+        $this->form->addField('Documento', $documento, '30%');
+        $this->form->addField('Nome', $nome, '50%');
+        $this->form->addField('Responsável', $responsavel, '50%');
+        $this->form->addField('Telefone', $telefone, '15%');
+        $this->form->addField('Tipo de Locatário', $tipo_locatario, '15%');   
+        $this->form->addField('Data de Cadastro', $data_cadastro, '10%');   
+
+        $codigo->setEditable(FALSE);
+        $data_cadastro->setValue(date("Y-m-d"));
+        $data_cadastro->setEditable(FALSE);
+
+        $this->form->addAction('Salvar', new Action ([$this, 'onSave']));
+
+        parent::add($this->form);
+    }
+    public function onSave()
+    {
+        try
+        {
+                Transaction::open('livro');
+                $dados = $this->form->getData();
+                $this->form->setData($dados);
+
+                $locatario = new Locatario;
+                $locatario->fromArray((array)$dados);
+                $locatario->store();
+
+                Transaction::close();
+                new Message('info', 'Locatário salvo com sucesso!');
+        }
+        catch(Exception $e)
+        {
+            new Message('error', $e->getMessage());
+            Transaction::rollback();
+        }
+    }
+
+    public function onEdit($param)
+    {
+        try
+        {
+            if(!empty($param['id']))
+            {
+                Transaction::open('livro');
+                $locatario =  Locatario::find($param['id']);
+                $this->form->setData($locatario);
+                Transaction::close();
+            }
+        }
+        catch(Exception $e)
+        {
+            new Message('error', $e->getMessage());
+            Transaction::rollback();
+        }
+    }
+}

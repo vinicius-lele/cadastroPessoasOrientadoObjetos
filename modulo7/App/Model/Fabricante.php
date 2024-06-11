@@ -3,6 +3,6 @@ use Livro\Database\Record;
 
 class Fabricante extends Record
 {
-     const TABLENAME = 'fabricante';
+     const TABLENAME = 'livro';
 	
 }

@@ -47,7 +47,7 @@ if ($_GET)
     }
     else
     {
-        $content = "Class <b>{$class}</b> not found"; 
+        $content = "<img src='App\Images\page_not_found.png' width=1000px height=900px>"; 
     }
 }
 $output = str_replace('{content}', $content, $template);
