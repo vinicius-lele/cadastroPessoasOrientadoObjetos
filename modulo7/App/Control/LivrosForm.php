@@ -7,6 +7,7 @@ use Livro\Widgets\Wrapper\FormWrapper;
 
 use Livro\Database\Transaction;
 use Livro\Control\Action;
+use Livro\Database\Record;
 use Livro\Widgets\Dialog\Message;
 
 class LivrosForm extends Page
@@ -34,6 +35,7 @@ class LivrosForm extends Page
         
 
         Transaction::open('livro');
+        $ultimo_id = $this->getLast()+1;
         $classificacoes = TipoClassificacao::all();
         $items = [];
         foreach($classificacoes as $obj_classificacao)
@@ -41,6 +43,7 @@ class LivrosForm extends Page
             $items[$obj_classificacao->id] = $obj_classificacao->codigo_classificacao.' - '.$obj_classificacao->nome_classificacao;
         }
         $classificacao->addItems($items);
+        $classificacao->setValue(4);
         Transaction::close();
 
         $this->form->addField('Código', $codigo, '10%');
@@ -54,6 +57,9 @@ class LivrosForm extends Page
         $this->form->addField('Disponível', $disponivel, '15%');   
 
         $codigo->setEditable(FALSE);
+        $codigo->setValue($ultimo_id);
+        $disponivel->setValue(1);
+        
 
         $this->form->addAction('Salvar', new Action ([$this, 'onSave']));
 
@@ -65,14 +71,15 @@ class LivrosForm extends Page
         {
                 Transaction::open('livro');
                 $dados = $this->form->getData();
-                $this->form->setData($dados);
+                
 
                 $livro = new Livro;
                 $livro->fromArray((array)$dados);
                 $livro->store();
 
                 Transaction::close();
-                new Message('info', 'Livro Salvo com sucesso!');
+                new Message('info', 'Livro Salvo com sucesso!<br/>');
+                //$this->form->setData((int)$dados["id"]+1);
         }
         catch(Exception $e)
         {
@@ -97,6 +104,29 @@ class LivrosForm extends Page
         {
             new Message('error', $e->getMessage());
             Transaction::rollback();
+        }
+    }
+
+    private function getLast()
+    {
+        // inicia transação
+        if ($conn = Transaction::get())
+        {
+            // instancia instrução de SELECT
+            $sql  = "SELECT max(id) FROM livro";
+            
+            // cria log e executa instrução SQL
+            Transaction::log($sql);
+            $result= $conn->query($sql);
+            
+            // retorna os dados do banco
+            $row = $result->fetch();
+            return $row[0];
+        }
+        else
+        {
+            // se não tiver transação, retorna uma exceção
+            throw new Exception('Não há transação ativa!!');
         }
     }
 }

@@ -98,6 +98,15 @@ class LocatariosList extends Page
         {
             foreach ($locatarios as $locatario)
             {
+                switch($locatario->tipo_locatario)
+                {
+                    case 1:
+                        $locatario->tipo_locatario = 'ALUNO';
+                        break;
+                    case 2:
+                        $locatario->tipo_locatario = 'SERVIDOR';
+                        break;
+                }
                 // adiciona o objeto na Datagrid
                 $this->datagrid->addItem($locatario);
             }

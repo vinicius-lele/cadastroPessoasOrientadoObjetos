@@ -55,10 +55,6 @@ class LivrosList extends Page
         $this->datagrid->addColumn($titulo);
         $this->datagrid->addColumn($autor);
         $this->datagrid->addColumn($disponivel);
-        
-        // Transaction::open('livro');
-        // $this->datagrid->addColumn(new TipoDisponivel($disponivel));
-        // Transaction::close();
 
         $this->datagrid->addAction( 'Editar',  new Action([new LivrosForm, 'onEdit']), 'id', 'fa fa-edit fa-lg blue');
         $this->datagrid->addAction( 'Excluir',  new Action([$this, 'onDelete']),         'id', 'fa fa-trash fa-lg red');
@@ -101,6 +97,7 @@ class LivrosList extends Page
         {
             foreach ($livros as $livro)
             {
+                $livro->disponivel = $livro->disponivel? "<b>DISPONÍVEL</b>" : '<font color="red"><b>INDISPONÍVEL</b></font>';
                 // adiciona o objeto na Datagrid
                 $this->datagrid->addItem($livro);
             }
