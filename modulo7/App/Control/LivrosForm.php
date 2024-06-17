@@ -35,7 +35,6 @@ class LivrosForm extends Page
         
 
         Transaction::open('livro');
-        $ultimo_id = $this->getLast()+1;
         $classificacoes = TipoClassificacao::all();
         $items = [];
         foreach($classificacoes as $obj_classificacao)
@@ -57,7 +56,6 @@ class LivrosForm extends Page
         $this->form->addField('Disponível', $disponivel, '15%');   
 
         $codigo->setEditable(FALSE);
-        $codigo->setValue($ultimo_id);
         $disponivel->setValue(1);
         
 
@@ -78,8 +76,7 @@ class LivrosForm extends Page
                 $livro->store();
 
                 Transaction::close();
-                new Message('info', 'Livro Salvo com sucesso!<br/>');
-                //$this->form->setData((int)$dados["id"]+1);
+                new Message('info', 'Livro '.$livro->id.' Salvo com sucesso!<br/>');
         }
         catch(Exception $e)
         {
@@ -104,29 +101,6 @@ class LivrosForm extends Page
         {
             new Message('error', $e->getMessage());
             Transaction::rollback();
-        }
-    }
-
-    private function getLast()
-    {
-        // inicia transação
-        if ($conn = Transaction::get())
-        {
-            // instancia instrução de SELECT
-            $sql  = "SELECT max(id) FROM livro";
-            
-            // cria log e executa instrução SQL
-            Transaction::log($sql);
-            $result= $conn->query($sql);
-            
-            // retorna os dados do banco
-            $row = $result->fetch();
-            return $row[0];
-        }
-        else
-        {
-            // se não tiver transação, retorna uma exceção
-            throw new Exception('Não há transação ativa!!');
         }
     }
 }
