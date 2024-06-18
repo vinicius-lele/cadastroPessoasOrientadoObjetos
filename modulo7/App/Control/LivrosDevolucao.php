@@ -1,5 +1,4 @@
 <?php
-
 use Livro\Control\Page;
 use Livro\Control\Action;
 use Livro\Widgets\Form\Form;
@@ -19,7 +18,7 @@ use Livro\Database\Criteria;
 /**
  * Listagem de Pessoas
  */
-class LivrosList extends Page
+class LivrosDevolucao extends Page
 {
     private $form;     // formulário de buscas
     private $datagrid; // listagem
@@ -31,42 +30,40 @@ class LivrosList extends Page
     public function __construct()
     {
         parent::__construct();
-
+        
         // instancia um formulário de buscas
         $this->form = new FormWrapper(new Form('form_busca_livros'));
-        $this->form->setTitle('Livros');
-
-        $titulo = new Entry('titulo');
-        $this->form->addField('Título', $titulo, '100%');
+        $this->form->setTitle('Buscar livro por ID');
+        
+        $id = new Entry('id');
+        $this->form->addField('Buscar', $id, '15%');
         $this->form->addAction('Buscar', new Action(array($this, 'onReload')));
-        $this->form->addAction('Novo', new Action(array(new LivrosForm, 'onEdit')));
 
-
+               
         // instancia objeto Datagrid
         $this->datagrid = new DatagridWrapper(new Datagrid);
 
         // instancia as colunas da Datagrid
-        $codigo   = new DatagridColumn('id',         'Código', 'center', '10%');
-        $titulo     = new DatagridColumn('titulo',       'Título',    'left', '50%');
-        $autor = new DatagridColumn('autor',   'Autor', 'left', '20%');
-        $disponivel   = new DatagridColumn('disponivel', 'Disponível', 'center', '20%');
+        $codigo   = new DatagridColumn('id_livro',         'Código livro', 'center', '10%');
+        $titulo     = new DatagridColumn('nome_livro',       'Livro',    'left', '50%');
+        $autor = new DatagridColumn('id_locatario',   'Locatário','left', '40%');
+
 
         // adiciona as colunas à Datagrid
         $this->datagrid->addColumn($codigo);
         $this->datagrid->addColumn($titulo);
         $this->datagrid->addColumn($autor);
-        $this->datagrid->addColumn($disponivel);
 
-        $this->datagrid->addAction('Editar',  new Action([new LivrosForm, 'onEdit']), 'id', 'fa fa-edit fa-lg blue');
-        $this->datagrid->addAction('Excluir',  new Action([$this, 'onDelete']),         'id', 'fa fa-trash fa-lg red');
-
+        $this->datagrid->addAction( 'Devolver',  new Action([$this, 'onDevolver']),         'id', 'fa fa-level-down red');
+        
         // monta a página através de uma caixa
         $box = new VBox;
         $box->style = 'display:block';
         $box->add($this->form);
         $box->add($this->datagrid);
-
+        
         parent::add($box);
+        
     }
 
     /**
@@ -75,11 +72,15 @@ class LivrosList extends Page
     public function onReload()
     {
         Transaction::open('livro'); // inicia transação com o BD
-        $repository = new Repository('Livro');
+        $repository = new Repository('Locacao');
+        $titulo = new Repository('Livro');
+        $locatario = new Repository('Locatario');
 
         // cria um critério de seleção de dados
         $criteria = new Criteria;
         $criteria->setProperty('order', 'id');
+        $criteria->add('data_devolucao','=','0000-00-00');
+        
         
         if (isset($_GET['offset'])) {
             $criteria->setProperty('limit', 15);
@@ -90,18 +91,30 @@ class LivrosList extends Page
         $dados = $this->form->getData();
 
         // verifica se o usuário preencheu o formulário
-        if ($dados->titulo) {
+        if ($dados->id)
+        {
             // filtra pelo nome do pessoa
-            $criteria->add('titulo', 'like', "%{$dados->titulo}%");
+            $criteria->add('id_livro', 'like', "%{$dados->id}%");
         }
 
         // carrega os produtos que satisfazem o critério
         $livros = $repository->load($criteria);
         $this->datagrid->clear();
-        if ($livros) {
-            foreach ($livros as $livro) {
-                $livro->disponivel = $livro->disponivel ? "<b>DISPONÍVEL</b>" : '<font color="red"><b>INDISPONÍVEL</b></font>';
-                // adiciona o objeto na Datagrid
+        if ($livros)
+        {
+            foreach ($livros as $livro)
+            {
+                $titulo = Livro::find($livro->id_livro);
+                $locatario = Locatario::find($livro->id_locatario);
+                $livro->nome_livro = $titulo->titulo;
+                $livro->id_locatario = $locatario->nome_locatario;
+                
+                // $this->datagrid->addItem([
+                //     'id_livro' => $livro->id,
+                //     'nome_livro' => $titulo->titulo,
+                //     'id_locatario' => $livro->id,
+                // ]);
+                
                 $this->datagrid->addItem($livro);
             }
         }
@@ -114,29 +127,32 @@ class LivrosList extends Page
     /**
      * Pergunta sobre a exclusão de registro
      */
-    public function onDelete($param)
+    public function onDevolver($param)
     {
         $id = $param['id']; // obtém o parâmetro $id
-        $action1 = new Action(array($this, 'Delete'));
+        $action1 = new Action(array($this, 'Devolver'));
         $action1->setParameter('id', $id);
-
-        new Question('Deseja realmente excluir o registro?', $action1);
+        
+        new Question('Deseja realmente devolver este livro?', $action1);
     }
 
     /**
      * Exclui um registro
      */
-    public function Delete($param)
+    public function Devolver($param)
     {
-        try {
+        try
+        {
             $id = $param['id']; // obtém a chave
             Transaction::open('livro'); // inicia transação com o banco 'livro'
             $livro = Livro::find($id);
-            $livro->delete(); // deleta objeto do banco de dados
+            $livro->devolve($id); // deleta objeto do banco de dados
             Transaction::close(); // finaliza a transação
             $this->onReload(); // recarrega a datagrid
             new Message('info', "Registro excluído com sucesso");
-        } catch (Exception $e) {
+        }
+        catch (Exception $e)
+        {
             new Message('error', $e->getMessage());
         }
     }
@@ -146,10 +162,11 @@ class LivrosList extends Page
      */
     public function show()
     {
-        // se a listagem ainda não foi carregada
-        if (!$this->loaded) {
-            $this->onReload();
-        }
-        parent::show();
+         // se a listagem ainda não foi carregada
+         if (!$this->loaded)
+         {
+	        $this->onReload();
+         }
+         parent::show();
     }
 }

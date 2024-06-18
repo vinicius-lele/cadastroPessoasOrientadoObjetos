@@ -1,4 +1,5 @@
 <?php
+
 use Livro\Control\Page;
 use Livro\Widgets\Form\Form;
 use Livro\Widgets\Form\Entry;
@@ -25,12 +26,11 @@ class LocatariosForm extends Page
         $telefone           = new Entry('telefone');
         $tipo_locatario     = new Combo('tipo_locatario');
         $data_cadastro      = new Entry('data_cadastro');
-        
+
         Transaction::open('livro');
         $tipos_locatarios = TipoLocatario::all();
         $items = [];
-        foreach($tipos_locatarios as $tipo_locatarios)
-        {
+        foreach ($tipos_locatarios as $tipo_locatarios) {
             $items[$tipo_locatarios->id] = $tipo_locatarios->nome_tipo_locatario;
         }
         $tipo_locatario->addItems($items);
@@ -41,53 +41,61 @@ class LocatariosForm extends Page
         $this->form->addField('Nome', $nome, '50%');
         $this->form->addField('Responsável', $responsavel, '50%');
         $this->form->addField('Telefone', $telefone, '15%');
-        $this->form->addField('Tipo de Locatário', $tipo_locatario, '15%');   
-        $this->form->addField('Data de Cadastro', $data_cadastro, '10%');   
+        $this->form->addField('Tipo de Locatário', $tipo_locatario, '15%');
+        $this->form->addField('Data de Cadastro', $data_cadastro, '10%');
 
         $codigo->setEditable(FALSE);
         $data_cadastro->setValue(date("Y-m-d"));
         $data_cadastro->setEditable(FALSE);
 
-        $this->form->addAction('Salvar', new Action ([$this, 'onSave']));
+        $this->form->addAction('Salvar', new Action([$this, 'onSave']));
 
         parent::add($this->form);
     }
+
     public function onSave()
     {
-        try
-        {
-                Transaction::open('livro');
-                $dados = $this->form->getData();
-                $this->form->setData($dados);
+        try {
+            Transaction::open('livro');
 
-                $locatario = new Locatario;
-                $locatario->fromArray((array)$dados);
-                $locatario->store();
+            // Obtém os dados do formulário como um objeto stdClass
+            $dados = $this->form->getData();
 
-                Transaction::close();
-                new Message('info', 'Locatário salvo com sucesso!');
-        }
-        catch(Exception $e)
-        {
+            // Converte o objeto stdClass para um array
+            $dadosArray = json_decode(json_encode($dados), true);
+
+            // Converte os dados para maiúsculas, preservando caracteres especiais
+            $dadosMaiusculos = array_map(function ($campo) {
+                return mb_strtoupper($campo, 'UTF-8'); // Converte cada campo para maiúsculas, mantendo caracteres especiais
+            }, $dadosArray);
+
+            // Atualiza os dados do formulário com os valores convertidos
+            $this->form->setData($dadosMaiusculos);
+
+            // Cria um novo objeto Locatario com os dados já convertidos
+            $locatario = new Locatario;
+            $locatario->fromArray((array)$dadosMaiusculos);
+            $locatario->store();
+
+            Transaction::close();
+            new Message('info', 'Locatário salvo com sucesso!');
+        } catch (Exception $e) {
             new Message('error', $e->getMessage());
             Transaction::rollback();
         }
     }
 
+
     public function onEdit($param)
     {
-        try
-        {
-            if(!empty($param['id']))
-            {
+        try {
+            if (!empty($param['id'])) {
                 Transaction::open('livro');
                 $locatario =  Locatario::find($param['id']);
                 $this->form->setData($locatario);
                 Transaction::close();
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             new Message('error', $e->getMessage());
             Transaction::rollback();
         }

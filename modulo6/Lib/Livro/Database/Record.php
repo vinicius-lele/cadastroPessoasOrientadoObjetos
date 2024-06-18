@@ -83,10 +83,14 @@ abstract class Record
 
     public function store()
     {
-        if(empty($this->data['id']) OR (!$this->load($this->data['id'])))
+        $convertedData = array_map(function($value) {
+            return strtoupper($value); // Converte cada valor para maiúsculas
+        }, $this->data);
+
+        if(empty($convertedData['id']) || (!$this->load($convertedData['id'])))
         {
-            $prepared = $this->prepare($this->data);
-            if(empty($this->data['id']))
+            $prepared = $this->prepare($convertedData);
+            if(empty($convertedData['id']))
             {
                 $this->data['id'] = $this->getLast()+1;
                 $prepared['id'] = $this->data['id'];
@@ -98,7 +102,7 @@ abstract class Record
         }
         else
         {
-            $prepared = $this->prepare($this->data);
+            $prepared = $this->prepare($convertedData);
             
             $set=[];
             foreach($prepared as $column =>$value)

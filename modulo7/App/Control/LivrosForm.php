@@ -64,26 +64,39 @@ class LivrosForm extends Page
         parent::add($this->form);
     }
     public function onSave()
+{
+    try
     {
-        try
-        {
-                Transaction::open('livro');
-                $dados = $this->form->getData();
-                
+        Transaction::open('livro');
 
-                $livro = new Livro;
-                $livro->fromArray((array)$dados);
-                $livro->store();
+        // Obtém os dados do formulário como um objeto stdClass
+        $dados = $this->form->getData();
 
-                Transaction::close();
-                new Message('info', 'Livro '.$livro->id.' Salvo com sucesso!<br/>');
-        }
-        catch(Exception $e)
-        {
-            new Message('error', $e->getMessage());
-            Transaction::rollback();
-        }
+        // Converte o objeto stdClass para um array
+        $dadosArray = json_decode(json_encode($dados), true);
+
+        // Converte os dados para maiúsculas, preservando caracteres especiais
+        $dadosMaiusculos = array_map(function($campo) {
+            return mb_strtoupper($campo, 'UTF-8'); // Converte cada campo para maiúsculas, mantendo caracteres especiais
+        }, $dadosArray);
+
+        // Atualiza os dados do formulário com os valores convertidos
+        $this->form->setData($dadosMaiusculos);
+
+        // Cria um novo objeto Livro com os dados já convertidos
+        $livro = new Livro;
+        $livro->fromArray((array)$dadosMaiusculos);
+        $livro->store();
+
+        Transaction::close();
+        new Message('info', 'Livro '.$livro->id.' Salvo com sucesso!<br/>');
     }
+    catch(Exception $e)
+    {
+        new Message('error', $e->getMessage());
+        Transaction::rollback();
+    }
+}
 
     public function onEdit($param)
     {
