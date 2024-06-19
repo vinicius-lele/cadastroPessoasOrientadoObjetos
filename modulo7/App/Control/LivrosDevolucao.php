@@ -109,12 +109,6 @@ class LivrosDevolucao extends Page
                 $livro->nome_livro = $titulo->titulo;
                 $livro->id_locatario = $locatario->nome_locatario;
                 
-                // $this->datagrid->addItem([
-                //     'id_livro' => $livro->id,
-                //     'nome_livro' => $titulo->titulo,
-                //     'id_locatario' => $livro->id,
-                // ]);
-                
                 $this->datagrid->addItem($livro);
             }
         }
@@ -133,7 +127,7 @@ class LivrosDevolucao extends Page
         $action1 = new Action(array($this, 'Devolver'));
         $action1->setParameter('id', $id);
         
-        new Question('Deseja realmente devolver este livro?', $action1);
+        new Question('Confirma devolução?', $action1);
     }
 
     /**
@@ -145,11 +139,16 @@ class LivrosDevolucao extends Page
         {
             $id = $param['id']; // obtém a chave
             Transaction::open('livro'); // inicia transação com o banco 'livro'
-            $livro = Livro::find($id);
-            $livro->devolve($id); // deleta objeto do banco de dados
+            $locacao = Locacao::find($id);
+            $locacao->data_devolucao = date('Y-m-d');
+            $locacao->store();
+            $livro = Livro::find($locacao->id_livro);
+            $livro->disponivel=1;
+            $livro->store();
+            // $livro->devolve($id); // deleta objeto do banco de dados
             Transaction::close(); // finaliza a transação
             $this->onReload(); // recarrega a datagrid
-            new Message('info', "Registro excluído com sucesso");
+            new Message('info', "Devolução concluída com sucesso");
         }
         catch (Exception $e)
         {
