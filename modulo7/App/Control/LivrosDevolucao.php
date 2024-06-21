@@ -78,7 +78,7 @@ class LivrosDevolucao extends Page
 
         // cria um critério de seleção de dados
         $criteria = new Criteria;
-        $criteria->setProperty('order', 'id');
+        $criteria->setProperty('order', 'data_emprestimo');
         $criteria->add('data_devolucao','=','0000-00-00');
         
         

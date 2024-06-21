@@ -52,10 +52,19 @@ class DatagridWrapper
         $this->createHeaders($thead);
 
         if (isset($_GET['offset'])) {
+
             $paginacao = new Element('paginacao');
-            $paginacao->add(' Paginação: ');
+            $paginacao->add(' Paginação: ');   
+            
+
             $proximo = $_GET['offset'] + 15;
             $anterior = $_GET['offset'] - 15;
+
+            if($_REQUEST['class']=="LivrosEmprestimo")
+            {
+                $proximo = $_GET['offset'] + 3;
+                $anterior = $_GET['offset'] - 3;
+            } 
 
 
             $x = explode('&offset=', $_SERVER['REQUEST_URI']);

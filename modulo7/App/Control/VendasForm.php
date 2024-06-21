@@ -42,9 +42,18 @@ class VendasForm extends Page
         
         $this->form->addField('Código', $codigo, '50%');
         $this->form->addField('Quantidade', $quantidade, '50%');
+        if(isset($_GET['codigo'])&&isset($_GET['quantidade']))
+        $this->form->addAction('EMPRESTA', new Action(array($this, 'onAdiciona')));
+        else
         $this->form->addAction('Adicionar', new Action(array($this, 'onAdiciona')));
-        $this->form->addAction('Terminar', new Action(array(new ConcluiVendaForm, 'onLoad')));
-        
+
+
+        if(isset($_GET['codigo']))
+            $codigo->setEditable(FALSE);
+
+        if(isset($_GET['quantidade']))
+            $quantidade->setEditable(FALSE);
+
         // instancia objeto Datagrid
         $this->datagrid = new DatagridWrapper(new Datagrid);
 
@@ -56,6 +65,7 @@ class VendasForm extends Page
 
         // define um transformador para a coluna preço
         $preco->setTransformer(array($this, 'formata_money'));
+        
 
         // adiciona as colunas à Datagrid
         $this->datagrid->addColumn($codigo);
@@ -64,6 +74,7 @@ class VendasForm extends Page
         $this->datagrid->addColumn($preco);
 
         $this->datagrid->addAction( 'Excluir',  new Action([$this, 'onDelete']), 'id_produto', 'fa fa-trash fa-lg red');
+        
         
         // monta a página através de uma caixa
         $box = new VBox;
