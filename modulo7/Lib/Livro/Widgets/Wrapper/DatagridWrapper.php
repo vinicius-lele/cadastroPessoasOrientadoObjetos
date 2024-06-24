@@ -60,10 +60,10 @@ class DatagridWrapper
             $proximo = $_GET['offset'] + 15;
             $anterior = $_GET['offset'] - 15;
 
-            if($_REQUEST['class']=="LivrosEmprestimo")
+            if($_REQUEST['class']=="SelecionaLivro" || $_REQUEST['class']=="SelecionaLocatario")
             {
-                $proximo = $_GET['offset'] + 3;
-                $anterior = $_GET['offset'] - 3;
+                $proximo = $_GET['offset'] + 10;
+                $anterior = $_GET['offset'] - 10;
             } 
 
 

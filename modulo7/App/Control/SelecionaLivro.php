@@ -20,7 +20,7 @@ use Livro\Database\Criteria;
 /**
  * Listagem de Pessoas
  */
-class LivrosEmprestimo extends Page
+class SelecionaLivro extends Page
 {
     private $form;     // formulário de buscas
     private $datagrid; // listagem
@@ -32,19 +32,6 @@ class LivrosEmprestimo extends Page
     public function __construct()
     {
         parent::__construct();
-        if (isset($_SESSION['id_livro'])) {
-            $this->geraTelaLocatario();
-        } else if(!isset($_SESSION['id_livro'])){
-            $this->geraTelaLivro(); 
-        } else {
-            echo 'tem turma do pedal';
-        }     
-
-        $this->onReload();
-    }
-
-    public function geraTelaLivro()
-    {
         $this->form = new FormWrapper(new Form('form_busca_livros'));
 
         $titulo = new Entry('titulo');
@@ -73,38 +60,6 @@ class LivrosEmprestimo extends Page
         parent::add($box);
     }
 
-    public function geraTelaLocatario()
-    {
-        $this->form = new FormWrapper(new Form('form_busca_locatarios'));
-        $this->form->setTitle('Locatários');
-        
-        $nome = new Entry('nome_locatario');
-        $this->form->addField('Nome', $nome, '100%');
-        $this->form->addAction('Buscar', new Action(array($this, 'onLoadLocatario')));
-
-               
-        // instancia objeto Datagrid
-        $this->datagrid = new DatagridWrapper(new Datagrid);
-
-        // instancia as colunas da Datagrid
-        $documento   = new DatagridColumn('documento',         'Documento', 'center', '10%');
-        $nome     = new DatagridColumn('nome_locatario',       'Nome',    'left', '30%');
-        $tipo = new DatagridColumn('tipo_locatario',   'Tipo','left', '60%');
-
-        // adiciona as colunas à Datagrid
-        $this->datagrid->addColumn($documento);
-        $this->datagrid->addColumn($nome);
-        $this->datagrid->addColumn($tipo);
-        
-
-        $this->datagrid->addAction('Selecionar Locatario',  new Action([$this, 'onAddLocatario']),         'id', 'fa fa-plus green');
-
-        $box = new VBox;
-        $box->style = 'display:block';
-        $box->add($this->form);
-        $box->add($this->datagrid);
-        parent::add($box);
-    }
 
     public function onLoadLivro()
     {
@@ -118,12 +73,16 @@ class LivrosEmprestimo extends Page
             $criteria->add('disponivel','<>',0);
     
             if (isset($_GET['offset'])) {
-                $criteria->setProperty('limit', 3);
+                $criteria->setProperty('limit', 10);
                 $criteria->setProperty('offset', $_GET['offset']);
             }
+
+            if(isset($_GET['emprestimo']))
+                new Message('info', "Livro Emprestado!");
     
             // obtém os dados do formulário de buscas
             $dados = $this->form->getData();
+            
     
             // verifica se o usuário preencheu o formulário
             if ($dados->titulo) {
@@ -187,33 +146,6 @@ class LivrosEmprestimo extends Page
         Transaction::close();
     }
 
-
-    /**
-     * Carrega a Datagrid com os objetos do banco de dados
-     */
-    public function onReload()
-    {
-        Transaction::open('livro');
-        if(!isset($_SESSION['id_livro']) && !isset($_SESSION['id_locatario']))
-        {
-            $this->onLoadLivro();
-        }
-        elseif(isset($_SESSION['id_livro']) && !isset($_SESSION['id_locatario']))
-        {
-            $this->onLoadLocatario();
-        }
-
-        else if (isset($_SESSION['id_livro']) && isset($_SESSION['id_locatario']))
-        {
-            echo 'temos o ID do livro:'.$_SESSION['id_livro'].'<br>temos o ID do locatario:'.$_SESSION['id_locatario'].'<br>temos a data de hoje:'.date('Y-m-d'); 
-        }
-         
-        
-
-        // finaliza a transação
-        Transaction::close();
-    }
-
     /**
      * Pergunta sobre a exclusão de registro
      */
@@ -221,24 +153,17 @@ class LivrosEmprestimo extends Page
     {
         $_SESSION['id_livro'] = $param['id'];
         new Message('info', "Livro selecionado!");
-        $this->datagrid->clear();
-        $this->geraTelaLocatario();
-        $this->onReload();      
+        //$this->onReload();
+        header("Location: index.php?class=SelecionaLocatario&offset=0");
+        die();
     }
 
-    public function onAddLocatario($param)
-    {
-        $_SESSION['id_locatario'] = $param['id'];
-        new Message('info', "Locatario selecionado!");
-        $this->onReload();         
-    }
-
-
-    /**
-     * Exibe a página
-     */
     public function show()
     {
+        // se a listagem ainda não foi carregada
+        if (!$this->loaded) {
+            $this->onLoadLivro();
+        }
         parent::show();
     }
 }
