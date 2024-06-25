@@ -65,7 +65,7 @@ class LocatariosList extends Page
         $box->style = 'display:block';
         $box->add($this->form);
         $box->add($this->datagrid);
-        
+
         parent::add($box);
     }
 
@@ -81,6 +81,8 @@ class LocatariosList extends Page
         $criteria = new Criteria;
         $criteria->setProperty('order', 'nome_locatario');
 
+        if(isset($_GET['done']))
+            new Message('info', 'Locatário salvo com sucesso!');
         // obtém os dados do formulário de buscas
         $dados = $this->form->getData();
 

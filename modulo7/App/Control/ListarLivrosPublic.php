@@ -19,7 +19,7 @@ use Livro\Database\Criteria;
 /**
  * Listagem de Pessoas
  */
-class LivrosList extends Page
+class ListarLivrosPublic extends Page
 {
     private $form;     // formulário de buscas
     private $datagrid; // listagem
@@ -39,7 +39,7 @@ class LivrosList extends Page
         $titulo = new Entry('titulo');
         $this->form->addField('Título', $titulo, '100%');
         $this->form->addAction('Buscar', new Action(array($this, 'onReload')));
-        $this->form->addAction('Novo', new Action(array(new LivrosForm, 'onEdit')));
+        $this->form->addAction('Voltar', new Action(array($this, 'onVoltar')));
 
 
         // instancia objeto Datagrid
@@ -58,9 +58,6 @@ class LivrosList extends Page
         $this->datagrid->addColumn($cor);
         $this->datagrid->addColumn($autor);
         $this->datagrid->addColumn($disponivel);
-
-        $this->datagrid->addAction('Editar',  new Action([new LivrosForm, 'onEdit']), 'id', 'fa fa-edit fa-lg blue');
-        $this->datagrid->addAction('Excluir',  new Action([$this, 'onDelete']),         'id', 'fa fa-trash fa-lg red');
 
         // monta a página através de uma caixa
         $box = new VBox;
@@ -88,8 +85,6 @@ class LivrosList extends Page
             $criteria->setProperty('offset', $_GET['offset']);
         }
 
-        if(isset($_GET['done']))
-            new Message('info', 'Livro salvo com sucesso!');
         // obtém os dados do formulário de buscas
         $dados = $this->form->getData();
 
@@ -225,34 +220,9 @@ class LivrosList extends Page
         $this->loaded = true;
     }
 
-    /**
-     * Pergunta sobre a exclusão de registro
-     */
-    public function onDelete($param)
+    public function onVoltar()
     {
-        $id = $param['id']; // obtém o parâmetro $id
-        $action1 = new Action(array($this, 'Delete'));
-        $action1->setParameter('id', $id);
-
-        new Question('Deseja realmente excluir o registro?', $action1);
-    }
-
-    /**
-     * Exclui um registro
-     */
-    public function Delete($param)
-    {
-        try {
-            $id = $param['id']; // obtém a chave
-            Transaction::open('livro'); // inicia transação com o banco 'livro'
-            $livro = Livro::find($id);
-            $livro->delete(); // deleta objeto do banco de dados
-            Transaction::close(); // finaliza a transação
-            $this->onReload(); // recarrega a datagrid
-            new Message('info', "Registro excluído com sucesso");
-        } catch (Exception $e) {
-            new Message('error', $e->getMessage());
-        }
+        echo "<script language='JavaScript'> window.location = 'index.php'; </script>";
     }
 
     /**

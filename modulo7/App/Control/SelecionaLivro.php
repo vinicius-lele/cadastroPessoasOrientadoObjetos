@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 use Livro\Control\Page;
 use Livro\Control\Action;
@@ -16,6 +15,7 @@ use Livro\Widgets\Wrapper\DatagridWrapper;
 use Livro\Database\Transaction;
 use Livro\Database\Repository;
 use Livro\Database\Criteria;
+use Livro\Session\Session;
 
 /**
  * Listagem de Pessoas
@@ -151,9 +151,8 @@ class SelecionaLivro extends Page
      */
     public function onAddLivro($param)
     {
-        $_SESSION['id_livro'] = $param['id'];
-        new Message('info', "Livro selecionado!");
-        //$this->onReload();
+        Session::setValue('id_livro',$param['id']);
+        new Message('info', "Livro selecionado!");;
         header("Location: index.php?class=SelecionaLocatario&offset=0");
         die();
     }

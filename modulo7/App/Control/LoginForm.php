@@ -36,7 +36,7 @@ class LoginForm extends Page
         $this->form->addField('Login',    $login,    200);
         $this->form->addField('Senha',    $password, 200);
         $this->form->addAction('Login', new Action(array($this, 'onLogin')));
-        
+        $this->form->addAction('Acessar Livros', new Action(array($this, 'onAcessaLivros')));
         // adiciona o formulário na página
         parent::add($this->form);
     }
@@ -46,6 +46,7 @@ class LoginForm extends Page
      */
     public function onLogin($param)
     {
+
         $data = $this->form->getData();
         if ($data->login == 'admin' AND $data->password == 'admin')
         {
@@ -61,5 +62,10 @@ class LoginForm extends Page
     {
         Session::setValue('logged', FALSE);
         echo "<script language='JavaScript'> window.location = 'index.php'; </script>";
+    }
+
+    public function onAcessaLivros()
+    {
+        echo "<script language='JavaScript'> window.location = 'listalivros.php?class=ListarLivrosPublic&offset=0'; </script>";
     }
 }

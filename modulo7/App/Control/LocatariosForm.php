@@ -78,7 +78,8 @@ class LocatariosForm extends Page
             $locatario->store();
 
             Transaction::close();
-            new Message('info', 'Locatário salvo com sucesso!');
+            
+            echo "<script language='JavaScript'> window.location = 'index.php?class=LocatariosList&offset=0&done=1'; </script>";
         } catch (Exception $e) {
             new Message('error', $e->getMessage());
             Transaction::rollback();

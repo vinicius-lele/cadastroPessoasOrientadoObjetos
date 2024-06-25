@@ -89,7 +89,7 @@ class LivrosForm extends Page
         $livro->store();
 
         Transaction::close();
-        new Message('info', 'Livro '.$livro->id.' Salvo com sucesso!<br/>');
+        echo "<script language='JavaScript'> window.location = 'index.php?class=LivrosList&offset=0&done=1'; </script>";
     }
     catch(Exception $e)
     {

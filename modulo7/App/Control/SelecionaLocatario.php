@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 use Livro\Control\Page;
 use Livro\Control\Action;
@@ -16,6 +15,7 @@ use Livro\Widgets\Wrapper\DatagridWrapper;
 use Livro\Database\Transaction;
 use Livro\Database\Repository;
 use Livro\Database\Criteria;
+use Livro\Session\Session;
 
 /**
  * Listagem de Pessoas
@@ -117,12 +117,12 @@ class SelecionaLocatario extends Page
 
         if (isset($_SESSION['id_livro']) && isset($_SESSION['id_locatario'])) {
             $action1 = new Action(array($this, 'Empresta'));
-            $action1->setParameter('id_livro', $_SESSION['id_livro']);
-            $action1->setParameter('id_locatario', $_SESSION['id_locatario']);
+            $action1->setParameter('id_livro', Session::getValue('id_livro'));
+            $action1->setParameter('id_locatario', Session::getValue('id_locatario'));
             $action1->setParameter('data_emprestimo', date('Y-m-d'));
 
-            $nome_locatario = Locatario::find($_SESSION['id_locatario']);
-            $titulo_livro = Livro::find($_SESSION['id_livro']);
+            $nome_locatario = Locatario::find(Session::getValue('id_locatario'));
+            $titulo_livro = Livro::find(Session::getValue('id_livro'));
             new Question('Confirma empréstimo?<br>
                             Livro: ' . $titulo_livro->titulo . '<br>
                             Locatario: ' . $nome_locatario->nome_locatario . '<br>
@@ -149,7 +149,7 @@ class SelecionaLocatario extends Page
             $locacao->store();
             $livro->store();
             Transaction::close();
-            session_destroy();
+            
             header("Location: index.php?class=SelecionaLivro&offset=0&emprestimo=true");
             die();
         } catch (Exception $e) {
@@ -160,7 +160,7 @@ class SelecionaLocatario extends Page
 
     public function onAddLocatario($param)
     {
-        $_SESSION['id_locatario'] = $param['id'];
+        Session::setValue('id_locatario',$param['id']);
         new Message('info', "Locatario selecionado!");
         $this->onReload();
     }
