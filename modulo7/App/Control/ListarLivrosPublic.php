@@ -34,10 +34,12 @@ class ListarLivrosPublic extends Page
 
         // instancia um formulário de buscas
         $this->form = new FormWrapper(new Form('form_busca_livros'));
-        $this->form->setTitle('Livros');
+        $this->form->setTitle('Pesquisa');
 
         $titulo = new Entry('titulo');
+        $autor = new Entry('autor');
         $this->form->addField('Título', $titulo, '100%');
+        $this->form->addField('Autor', $autor, '100%');
         $this->form->addAction('Buscar', new Action(array($this, 'onReload')));
         $this->form->addAction('Voltar', new Action(array($this, 'onVoltar')));
 
@@ -92,6 +94,11 @@ class ListarLivrosPublic extends Page
         if ($dados->titulo) {
             // filtra pelo nome do pessoa
             $criteria->add('titulo', 'like', "%{$dados->titulo}%");
+        }
+
+        if ($dados->autor) {
+            // filtra pelo nome do pessoa
+            $criteria->add('autor', 'like', "%{$dados->autor}%");
         }
 
         // carrega os produtos que satisfazem o critério
