@@ -25,6 +25,7 @@ class LivrosForm extends Page
         $editora         = new Entry('editora');
         $edicao         = new Entry('edicao');
         $ano            = new Entry('ano');
+        $volume            = new Entry('volume');
         $classificacao  = new Combo('classificacao');
         $extra          = new Entry('extra');
         $disponivel     = new Combo('disponivel');
@@ -51,6 +52,7 @@ class LivrosForm extends Page
         $this->form->addField('Editora', $editora, '70%');
         $this->form->addField('Edição', $edicao, '8%');
         $this->form->addField('Ano', $ano, '8%');   
+        $this->form->addField('Volume', $volume, '8%');   
         $this->form->addField('Classificação', $classificacao, '40%');  
         $this->form->addField('Extra', $extra, '15%'); 
         $this->form->addField('Disponível', $disponivel, '15%');   

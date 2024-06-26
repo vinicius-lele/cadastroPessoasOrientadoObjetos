@@ -48,9 +48,9 @@ class LivrosList extends Page
         // instancia as colunas da Datagrid
         $codigo   = new DatagridColumn('id',         'Código', 'center', '10%');
         $titulo     = new DatagridColumn('titulo',       'Título',    'left', '30%');
-        $cor     = new DatagridColumn('cor',       'Cor',    'left', '5%');
+        $cor     = new DatagridColumn('cor',       'Cor',    'center', '5%');
         $autor = new DatagridColumn('autor',   'Autor', 'left', '15%');
-        $disponivel   = new DatagridColumn('disponivel', 'Disponível', 'center', '40%');
+        $disponivel   = new DatagridColumn('disponivel', 'Disponível', 'left', '40%');
 
         // adiciona as colunas à Datagrid
         $this->datagrid->addColumn($codigo);
@@ -104,8 +104,18 @@ class LivrosList extends Page
         $this->datagrid->clear();
         if ($livros) {
             foreach ($livros as $livro) {
-                $livro->disponivel = $livro->disponivel ? '<font color="green">DISPONÍVEL</font>' : '<font color="red">INDISPONÍVEL</font>';
-                $livro->cor = $livro->classificacao . '-' . mb_substr($livro->autor, 0, 1);
+                switch($livro->disponivel)
+                {
+                    case 0:
+                        $livro->disponivel = '<font color="red">INDISPONÍVEL</font>';
+                        break;
+                    case 1:
+                        $livro->disponivel = '<font color="green">DISPONÍVEL</font>';
+                        break;
+                    default:
+                        $livro->disponivel = '<font color="red"><b>ITEM EXCLUÍDO</b></font>';
+
+                }
                 $primeiraLetra = mb_substr($livro->autor, 0, 1);
                 switch ($livro->classificacao) {
                     case 1:

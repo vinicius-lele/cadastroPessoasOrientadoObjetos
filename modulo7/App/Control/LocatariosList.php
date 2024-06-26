@@ -45,10 +45,10 @@ class LocatariosList extends Page
         $this->datagrid = new DatagridWrapper(new Datagrid);
 
         // instancia as colunas da Datagrid
-        $documento   = new DatagridColumn('documento',         'Documento', 'center', '10%');
-        $nome     = new DatagridColumn('nome_locatario',       'Nome',    'left', '50%');
-        $tipo = new DatagridColumn('tipo_locatario',   'Tipo','left', '20%');
-        $telefone   = new DatagridColumn('telefone','Telefone', 'center', '20%');
+        $documento   = new DatagridColumn('documento',         'Documento', 'left', '10%');
+        $nome     = new DatagridColumn('nome_locatario',       'Nome',    'left', '30%');
+        $tipo = new DatagridColumn('tipo_locatario',   'Tipo','left', '10%');
+        $telefone   = new DatagridColumn('telefone','Telefone', 'left', '50%');
 
         // adiciona as colunas à Datagrid
         $this->datagrid->addColumn($documento);
